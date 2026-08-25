@@ -198,8 +198,8 @@
   }
 
   function lockButtons() {
-    if (prevBtn) prevBtn.disabled = true;
-    if (nextBtn) nextBtn.disabled = true;
+    if (prevBtn) prevBtn.style.display = 'none';
+    if (nextBtn) nextBtn.style.display = 'none';
   }
 
   function refreshButtonState() {
@@ -208,12 +208,14 @@
     const idx = findCurrentLessonIndex(lessons);
     if (!prevBtn || !nextBtn) return;
     if (idx === -1) {
-      prevBtn.disabled = true;
-      nextBtn.disabled = true;
+      // 还没识别到当前 li，两个按钮都隐藏
+      prevBtn.style.display = 'none';
+      nextBtn.style.display = 'none';
       return;
     }
-    prevBtn.disabled = idx <= 0;
-    nextBtn.disabled = idx >= lessons.length - 1;
+    // 第一节：隐藏上一节；最后一节：隐藏下一节
+    prevBtn.style.display = idx <= 0 ? 'none' : '';
+    nextBtn.style.display = idx >= lessons.length - 1 ? 'none' : '';
   }
 
   // ---------- 挂载 / 卸载 ----------
