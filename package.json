@@ -1,0 +1,13 @@
+{
+  "name": "ysjf-player-enhancer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chrome extension dev tools: file watcher that auto-reloads the extension via Chrome DevTools Protocol",
+  "scripts": {
+    "watch": "node scripts/watch.js"
+  },
+  "devDependencies": {
+    "chokidar": "^3.6.0",
+    "ws": "^8.18.0"
+  }
+}

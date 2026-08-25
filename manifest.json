@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "ysjf-player-enhancer",
+  "version": "1.0.0",
+  "description": "A simple Chrome extension with a popup that displays Test text",
+  "permissions": ["storage", "tabs"],
+  "host_permissions": [
+    "http://127.0.0.1:*/*",
+    "https://course.ysjf.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://course.ysjf.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Test Popup"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
