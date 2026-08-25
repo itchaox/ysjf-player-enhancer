@@ -83,3 +83,14 @@ chrome.storage.sync.get([STORAGE_KEY], (res) => {
 });
 
 globalThis.__ysjfReloadNow = () => chrome.runtime.reload();
+
+// ---------- 接收 content script 的状态查询 ----------
+chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  if (!msg || msg.type !== 'ysjf-get-state') return;
+  // 读 storage 当前状态回给 content script
+  chrome.storage.sync.get([STORAGE_KEY], (res) => {
+    sendResponse({ enabled: Boolean(res[STORAGE_KEY]) });
+  });
+  // 必须 return true 表示异步响应
+  return true;
+});

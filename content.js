@@ -271,4 +271,33 @@
     sendResponse({ ok: true, mounted: msg.enabled });
     return false;
   });
+
+  // ---------- 主动查询 background 当前状态 ----------
+  // 解决：storage.enabled=true 但页面刚打开时按钮不显示的问题
+  // content script 注入后立即问 background，background 回当前状态
+  function queryStateAndMount() {
+    try {
+      chrome.runtime.sendMessage({ type: 'ysjf-get-state' }, (resp) => {
+        if (chrome.runtime.lastError) {
+          console.warn('[ysjf-enhancer] 查询 background 状态失败:', chrome.runtime.lastError.message);
+          return;
+        }
+        if (resp && resp.enabled) {
+          console.log('[ysjf-enhancer] 主动查询到 enabled=true，挂载按钮');
+          mount();
+        } else {
+          console.log('[ysjf-enhancer] 主动查询 enabled=false，不挂载');
+        }
+      });
+    } catch (e) {
+      console.warn('[ysjf-enhancer] sendMessage 异常:', e.message);
+    }
+  }
+
+  // 页面加载完成后主动查询一次
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', queryStateAndMount, { once: true });
+  } else {
+    queryStateAndMount();
+  }
 })();
