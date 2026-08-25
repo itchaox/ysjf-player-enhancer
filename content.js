@@ -1,5 +1,6 @@
 // content.js
-// 在 https://course.ysjf.com/ 的页面里注入"上一节/下一节"按钮
+// 在 https://course.ysjf.com/ 的页面里把"上一节/下一节"按钮嵌入到 video.js 播放器控制栏
+// 位置：.vjs-control-bar 内，.vjs-play-control 按钮的左右两侧
 // 切换对象：所有 ul.collapse-content 下的 外层 li（每节课）
 // 当前 li 识别：包含 <img src="playing-*.gif"> 的 li
 
@@ -7,56 +8,91 @@
   'use strict';
 
   const TARGET_HOST = 'course.ysjf.com';
-  const CONTAINER_ID = 'ysjf-player-enhancer-buttons';
   const STYLE_ID = 'ysjf-player-enhancer-style';
+  const PREV_BTN_ID = 'ysjf-enhancer-prev';
+  const NEXT_BTN_ID = 'ysjf-enhancer-next';
 
   // 只在目标域名生效
   if (location.hostname !== TARGET_HOST && !location.hostname.endsWith('.' + TARGET_HOST)) {
     return;
   }
 
+  // ---------- 选择器 ----------
+  const LIST_SELECTOR = 'ul.collapse-content';
+  const PLAYING_IMG_SELECTOR = 'img[src*="playing"]';
+  const CONTROL_BAR_SELECTOR = '.vjs-control-bar';
+  const PLAY_BTN_SELECTOR = 'button.vjs-play-control';
+
   let mounted = false;
   let prevBtn, nextBtn;
+  let switching = false;
+  let controlBarObserver = null; // 监听 .vjs-control-bar 是否出现
+  let refreshTimer = null;
 
-  // ---------- 选择器配置 ----------
-  const LIST_SELECTOR = 'ul.collapse-content'; // 章节组容器
-  const PLAYING_IMG_SELECTOR = 'img[src*="playing"]'; // 当前播放图标（playing-*.gif）
+  // ---------- 工具：收集所有 li ----------
+  function collectLessons() {
+    const uls = document.querySelectorAll(LIST_SELECTOR);
+    const lessons = [];
+    for (const ul of uls) {
+      for (const li of ul.children) {
+        if (li.tagName === 'LI') lessons.push(li);
+      }
+    }
+    return lessons;
+  }
 
-  // ---------- 工具：注入样式 ----------
+  function findCurrentLessonIndex(lessons) {
+    for (let i = 0; i < lessons.length; i++) {
+      if (lessons[i].querySelector(PLAYING_IMG_SELECTOR)) return i;
+    }
+    return -1;
+  }
+
+  // ---------- 点击某个 li ----------
+  function clickLesson(li) {
+    if (!li) return false;
+    const target = li.querySelector('div.cursor-pointer') || li;
+    target.click();
+    return true;
+  }
+
+  // ---------- 切换等待 ----------
+  function waitForSwitch(targetIdx, timeoutMs = 5000) {
+    return new Promise((resolve) => {
+      const start = Date.now();
+      const tick = setInterval(() => {
+        const lessons = collectLessons();
+        const cur = findCurrentLessonIndex(lessons);
+        if (cur === targetIdx) { clearInterval(tick); resolve(true); }
+        else if (Date.now() - start > timeoutMs) { clearInterval(tick); resolve(false); }
+      }, 200);
+    });
+  }
+
+  // ---------- 注入样式（仅视频图标相关） ----------
   function injectStyle() {
     if (document.getElementById(STYLE_ID)) return;
     const css = `
-      #${CONTAINER_ID} {
-        position: fixed !important;
-        right: 24px !important;
-        bottom: 96px !important;
-        z-index: 2147483647 !important; /* 最高优先级，避免被覆盖 */
-        display: flex !important;
-        gap: 8px !important;
-        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif !important;
-        pointer-events: auto !important;
+      /* 上一节 / 下一节按钮：复用 video.js 的 vjs-button 样式，仅替换图标 */
+      .vjs-button.ysjf-enhancer-btn {
+        cursor: pointer;
       }
-      #${CONTAINER_ID} button {
-        all: unset;
-        box-sizing: border-box !important;
-        cursor: pointer !important;
-        padding: 10px 18px !important;
-        background: #1e88e5 !important;
-        color: #fff !important;
-        border-radius: 6px !important;
-        font-size: 14px !important;
-        line-height: 1 !important;
-        user-select: none !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.25) !important;
-        transition: background 0.15s !important;
+      .vjs-button.ysjf-enhancer-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
       }
-      #${CONTAINER_ID} button:hover:not(:disabled) {
-        background: #1565c0 !important;
+      /* 上一节图标：左箭头 ◀ */
+      .vjs-button.ysjf-enhancer-btn .vjs-icon-placeholder:before {
+        font-size: 18px;
+        line-height: 1.6;
+        display: inline-block;
       }
-      #${CONTAINER_ID} button:disabled {
-        background: #9e9e9e !important;
-        cursor: not-allowed !important;
-        opacity: 0.6 !important;
+      #${PREV_BTN_ID} .vjs-icon-placeholder:before {
+        content: "\\23EA"; /* ⏪ */
+      }
+      /* 下一节图标：右箭头 ▶ */
+      #${NEXT_BTN_ID} .vjs-icon-placeholder:before {
+        content: "\\23E9"; /* ⏩ */
       }
     `;
     const style = document.createElement('style');
@@ -65,74 +101,105 @@
     document.head.appendChild(style);
   }
 
-  // ---------- 工具：把所有 ul.collapse-content 下的 li 收集起来 ----------
-  // 按 DOM 顺序排，因为 ul 是按章节分组的，flatten 后就是课程总列表
-  function collectLessons() {
-    const uls = document.querySelectorAll(LIST_SELECTOR);
-    const lessons = [];
-    for (const ul of uls) {
-      // 每个 ul 下的直接子 li
-      for (const li of ul.children) {
-        if (li.tagName !== 'LI') continue;
-        lessons.push(li);
-      }
-    }
-    return lessons;
+  // ---------- 工具：克隆 video.js 播放按钮的结构 ----------
+  function createEnhancerButton(id, title, controlText) {
+    const btn = document.createElement('button');
+    btn.id = id;
+    btn.className = 'vjs-button vjs-control ysjf-enhancer-btn';
+    btn.type = 'button';
+    btn.setAttribute('aria-live', 'polite');
+    btn.title = title;
+    btn.setAttribute('aria-disabled', 'false');
+
+    const icon = document.createElement('span');
+    icon.setAttribute('aria-hidden', 'true');
+    icon.className = 'vjs-icon-placeholder';
+
+    const text = document.createElement('span');
+    text.className = 'vjs-control-text';
+    text.textContent = controlText;
+
+    btn.appendChild(icon);
+    btn.appendChild(text);
+    return btn;
   }
 
-  // ---------- 工具：找到当前播放的 li ----------
-  function findCurrentLessonIndex(lessons) {
-    for (let i = 0; i < lessons.length; i++) {
-      if (lessons[i].querySelector(PLAYING_IMG_SELECTOR)) {
-        return i;
-      }
-    }
-    return -1;
-  }
+  // ---------- 把按钮插入到 .vjs-control-bar 里，播放按钮左右 ----------
+  function insertButtonsToControlBar() {
+    const bar = document.querySelector(CONTROL_BAR_SELECTOR);
+    if (!bar) return false;
 
-  // ---------- 点击某个 li ----------
-  // 框架的 click 监听通常挂在 li 内的 .cursor-pointer div 上
-  function clickLesson(li) {
-    if (!li) return false;
+    const playBtn = bar.querySelector(PLAY_BTN_SELECTOR);
+    if (!playBtn) return false;
 
-    // 优先点 li 内的 .cursor-pointer div（框架事件监听点）
-    // 其次才是 li 本身
-    const target = li.querySelector('div.cursor-pointer') || li;
-
-    console.log('[ysjf-enhancer] 派发点击到:', target.tagName, target.className.slice(0, 60));
-
-    // 1) 原生 click
-    target.click();
-
-    // 2) 派发完整鼠标事件序列（pointerdown/pointerup/mousedown/mouseup/click）
-    // 框架（Vue/React）通常在 root 节点上用 addEventListener 监听 mousedown
-    const rect = target.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
-    const baseInit = {
-      bubbles: true,
-      cancelable: true,
-      view: window,
-      clientX: x,
-      clientY: y,
-      button: 0,
-      buttons: 1,
-    };
-    for (const type of ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click']) {
-      try {
-        target.dispatchEvent(new MouseEvent(type, baseInit));
-      } catch (e) {}
+    // 已插入则跳过
+    if (bar.querySelector('#' + PREV_BTN_ID) && bar.querySelector('#' + NEXT_BTN_ID)) {
+      return true;
     }
 
+    if (!prevBtn) {
+      prevBtn = createEnhancerButton(PREV_BTN_ID, '上一节', '上一节');
+      prevBtn.addEventListener('click', async () => {
+        if (switching) return;
+        const lessons = collectLessons();
+        const idx = findCurrentLessonIndex(lessons);
+        if (idx <= 0) return;
+
+        switching = true;
+        lockButtons();
+        const targetIdx = idx - 1;
+        clickLesson(lessons[targetIdx]);
+        console.log('[ysjf-enhancer] 点击上一节 (idx=' + targetIdx + ')');
+        await waitForSwitch(targetIdx);
+        switching = false;
+        refreshButtonState();
+      });
+    }
+
+    if (!nextBtn) {
+      nextBtn = createEnhancerButton(NEXT_BTN_ID, '下一节', '下一节');
+      nextBtn.addEventListener('click', async () => {
+        if (switching) return;
+        const lessons = collectLessons();
+        const idx = findCurrentLessonIndex(lessons);
+        if (idx < 0 || idx >= lessons.length - 1) return;
+
+        switching = true;
+        lockButtons();
+        const targetIdx = idx + 1;
+        clickLesson(lessons[targetIdx]);
+        console.log('[ysjf-enhancer] 点击下一节 (idx=' + targetIdx + ')');
+        await waitForSwitch(targetIdx);
+        switching = false;
+        refreshButtonState();
+      });
+    }
+
+    // 插入到播放按钮的左右
+    // playBtn.parentNode.insertBefore(prevBtn, playBtn) → 上一节插到播放按钮前
+    // playBtn.parentNode.insertBefore(nextBtn, playBtn.nextSibling) → 下一节插到播放按钮后
+    playBtn.parentNode.insertBefore(prevBtn, playBtn);
+    if (playBtn.nextSibling) {
+      playBtn.parentNode.insertBefore(nextBtn, playBtn.nextSibling);
+    } else {
+      playBtn.parentNode.appendChild(nextBtn);
+    }
+
+    console.log('[ysjf-enhancer] 按钮已嵌入 .vjs-control-bar');
     return true;
   }
 
-  // ---------- 切换按钮可用性 ----------
+  function lockButtons() {
+    if (prevBtn) prevBtn.disabled = true;
+    if (nextBtn) nextBtn.disabled = true;
+  }
+
   function refreshButtonState() {
+    if (switching) return;
     const lessons = collectLessons();
     const idx = findCurrentLessonIndex(lessons);
+    if (!prevBtn || !nextBtn) return;
     if (idx === -1) {
-      // 还没识别到当前 li（页面可能刚加载）
       prevBtn.disabled = true;
       nextBtn.disabled = true;
       return;
@@ -141,59 +208,50 @@
     nextBtn.disabled = idx >= lessons.length - 1;
   }
 
-  // ---------- 创建 UI ----------
-  function buildUI() {
-    injectStyle();
-    const wrap = document.createElement('div');
-    wrap.id = CONTAINER_ID;
-
-    prevBtn = document.createElement('button');
-    prevBtn.textContent = '上一节';
-    prevBtn.addEventListener('click', () => {
-      const lessons = collectLessons();
-      const idx = findCurrentLessonIndex(lessons);
-      if (idx > 0) {
-        const ok = clickLesson(lessons[idx - 1]);
-        console.log('[ysjf-enhancer] 点击上一节 (idx=' + (idx - 1) + '):', ok);
-      }
-    });
-
-    nextBtn = document.createElement('button');
-    nextBtn.textContent = '下一节';
-    nextBtn.addEventListener('click', () => {
-      const lessons = collectLessons();
-      const idx = findCurrentLessonIndex(lessons);
-      if (idx >= 0 && idx < lessons.length - 1) {
-        const ok = clickLesson(lessons[idx + 1]);
-        console.log('[ysjf-enhancer] 点击下一节 (idx=' + (idx + 1) + '):', ok);
-      }
-    });
-
-    wrap.appendChild(prevBtn);
-    wrap.appendChild(nextBtn);
-    refreshButtonState();
-    return wrap;
-  }
-
   // ---------- 挂载 / 卸载 ----------
   function mount() {
     if (mounted) return;
     if (!document.body) {
       return document.addEventListener('DOMContentLoaded', mount, { once: true });
     }
-    document.body.appendChild(buildUI());
-    mounted = true;
-    console.log('[ysjf-enhancer] 按钮已挂载');
 
-    // 页面内容可能动态变化（切章节后 li 列表会变），定时刷新按钮可用性
-    setInterval(refreshButtonState, 1000);
+    injectStyle();
+
+    // 视频可能异步加载，用 MutationObserver 等待 .vjs-control-bar 出现
+    controlBarObserver = new MutationObserver(() => {
+      if (insertButtonsToControlBar()) {
+        refreshButtonState();
+      }
+    });
+    controlBarObserver.observe(document.body, { childList: true, subtree: true });
+
+    // 立即尝试一次（可能视频已加载好）
+    if (insertButtonsToControlBar()) {
+      refreshButtonState();
+    }
+
+    mounted = true;
+    console.log('[ysjf-enhancer] 挂载完成，等待 .vjs-control-bar 出现');
+
+    // 定时刷新按钮可用性（页面上 li 可能动态变化）
+    refreshTimer = setInterval(refreshButtonState, 1000);
   }
 
   function unmount() {
-    const el = document.getElementById(CONTAINER_ID);
-    if (el) el.remove();
+    if (controlBarObserver) {
+      controlBarObserver.disconnect();
+      controlBarObserver = null;
+    }
+    if (refreshTimer) {
+      clearInterval(refreshTimer);
+      refreshTimer = null;
+    }
+    if (prevBtn) prevBtn.remove();
+    if (nextBtn) nextBtn.remove();
+    prevBtn = null;
+    nextBtn = null;
     mounted = false;
-    console.log('[ysjf-enhancer] 按钮已移除');
+    console.log('[ysjf-enhancer] 按钮已卸载');
   }
 
   // ---------- 接收 background 消息 ----------
