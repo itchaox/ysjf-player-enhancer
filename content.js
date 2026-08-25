@@ -88,6 +88,11 @@
         display: inline-block;
         fill: currentColor;
       }
+      /* 上一节按钮图标旋转 180°，从 ⏭ 变成 ⏮ */
+      #${PREV_BTN_ID} .vjs-icon-placeholder {
+        transform: rotate(180deg);
+        transform-origin: center center;
+      }
     `;
     const style = document.createElement('style');
     style.id = STYLE_ID;
