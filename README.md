@@ -1,23 +1,25 @@
 # ysjf-player-enhancer
 
-一个面向 [course.ysjf.com](https://course.ysjf.com/) 的 Chrome 浏览器扩展（Manifest V3），用快捷按钮在视频页内一键切换上一节 / 下一节。
+一个面向 [course.ysjf.com](https://course.ysjf.com/) 的 Chrome 浏览器扩展（Manifest V3），在 video.js 播放器的原生控制栏里嵌入"上一节 / 下一节"两个按钮。
 
 ## 功能
 
-- 🎬 **章节切换按钮**：在课程页右下角注入蓝色"上一节 / 下一节"按钮
-- 💾 **状态持久化**：开关状态跨设备同步（基于 `chrome.storage.sync`）
-- 🔌 **可插拔**：开关关闭时按钮自动从页面移除
-- ♻️ **开发热加载**：文件改动后扩展自动 reload，无需手动去 `chrome://extensions/` 刷新
+- 🎬 **嵌入播放器控制栏**：按钮插入到 `.vjs-control-bar` 内 `.vjs-play-control` 按钮的左右两侧，外观与原生控件一致
+- ⏮ **当前是第一节时自动隐藏"上一节"**，当前是最后一节时自动隐藏"下一节"
+- 🔄 **点击切换章节**：点击按钮触发目标 li 的原生 click 事件，由页面框架（Vue/React）处理路由切换
+- 💾 **状态持久化**：开关状态通过 `chrome.storage.sync` 跨设备同步
+- 🔌 **可插拔**：关闭开关后按钮从控制栏移除
+- ♻️ **开发热加载**：修改文件保存即自动 reload 扩展，无需去 `chrome://extensions/` 手动刷新
 
 ## 项目结构
 
 ```
 ysjf-player-enhancer/
 ├── manifest.json          # Manifest V3 配置（content_scripts / permissions）
-├── popup.html             # 弹窗 UI（含开关）
+├── popup.html             # 弹窗 UI（含"播放器增强"开关）
 ├── popup.js               # 弹窗逻辑（读写 chrome.storage）
 ├── background.js          # Service Worker：广播开关状态 + 热加载 helper
-├── content.js             # 注入页面：识别章节、注入按钮、点击切换
+├── content.js             # 注入页面：识别章节、嵌入按钮、点击切换
 ├── scripts/
 │   └── watch.js           # chokidar + 本地 HTTP server，驱动自动 reload
 ├── icons/                 # 16/48/128 尺寸占位图标
@@ -50,6 +52,16 @@ npm run watch
 
 启动后，修改任意 `.js` / `.html` / `.json` 文件保存，扩展会在约 2 秒内自动 reload（**注意：已打开的 course.ysjf.com 页面需要手动刷新一次以重新注入 content script**）。
 
+## 使用方法
+
+1. 访问 [course.ysjf.com](https://course.ysjf.com/) 的任意课程播放页
+2. 等待视频加载（控制栏出现后按钮自动嵌入）
+3. 点击扩展图标 → 打开 **"播放器增强"** 开关
+4. 播放按钮左侧出现 ⏮ "上一节"、右侧出现 ⏭ "下一节"
+5. 点击按钮即可切换章节
+
+切换章节时按钮会短暂隐藏（避免重复点击）；新章节加载完成后恢复显示。
+
 ## 开发流程
 
 | 文件改动 | 热加载行为 |
@@ -64,9 +76,12 @@ npm run watch
 
 - 只在 `course.ysjf.com` 域名生效
 - 接收 background 的 `ysjf-toggle` 消息，控制按钮挂载/卸载
+- 用 `MutationObserver` 等待 `.vjs-control-bar` 异步出现，再把按钮插入到播放按钮两侧
 - 识别当前播放节：通过 `img[src*="playing"]` 图标定位
 - 章节列表：`ul.collapse-content` 下的所有 `<li>`（flatten 后按 DOM 顺序）
-- 点击方式：派发 `pointerdown / mousedown / pointerup / mouseup / click` 全套鼠标事件，兼容 Vue / React 的合成事件系统
+- 第一节时隐藏"上一节"，最后一节时隐藏"下一节"
+- 点击目标 li 的 `div.cursor-pointer` 触发原生 click，由 Vue/React 框架处理路由切换
+- 切换期间锁定按钮，等待 `playing.gif` 移到目标 li 后再解锁（最多 5 秒超时兜底）
 
 ### `background.js`
 
@@ -78,13 +93,6 @@ npm run watch
 - chokidar 监听 `manifest.json / popup.* / background.js / content.js`
 - 计算文件指纹（mtime + size 的 SHA-1），通过 `GET /version` 暴露
 - 监听 `GET /health` 和 `POST /trigger` 用于健康检查 / 手动触发 reload
-
-## 后续规划
-
-- ⌨️ 键盘快捷键（左右方向键切上下节）
-- ⏭️ 自动跳过片头片尾
-- 📌 视频倍速记忆
-- 🖼️ 画中画按钮
 
 ## License
 
