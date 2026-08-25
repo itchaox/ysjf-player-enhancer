@@ -81,18 +81,12 @@
         opacity: 0.4;
         cursor: not-allowed;
       }
-      /* 上一节图标：左箭头 ◀ */
-      .vjs-button.ysjf-enhancer-btn .vjs-icon-placeholder:before {
-        font-size: 18px;
-        line-height: 1.6;
+      /* 内联 SVG 图标：覆盖 video.js 默认的 icon-placeholder 字体图标样式 */
+      .vjs-button.ysjf-enhancer-btn .vjs-icon-placeholder {
+        width: 22px;
+        height: 22px;
         display: inline-block;
-      }
-      #${PREV_BTN_ID} .vjs-icon-placeholder:before {
-        content: "\\23EA"; /* ⏪ */
-      }
-      /* 下一节图标：右箭头 ▶ */
-      #${NEXT_BTN_ID} .vjs-icon-placeholder:before {
-        content: "\\23E9"; /* ⏩ */
+        fill: currentColor;
       }
     `;
     const style = document.createElement('style');
@@ -111,15 +105,24 @@
     btn.title = title;
     btn.setAttribute('aria-disabled', 'false');
 
-    const icon = document.createElement('span');
-    icon.setAttribute('aria-hidden', 'true');
-    icon.className = 'vjs-icon-placeholder';
+    // 内联 SVG 图标（用户指定的图标）
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svg.setAttribute('xml:space', 'preserve');
+    svg.setAttribute('data-pointer', 'none');
+    svg.setAttribute('style', 'enable-background:new 0 0 22 22');
+    svg.setAttribute('viewBox', '0 0 22 22');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.classList.add('vjs-icon-placeholder');
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M16 5a1 1 0 0 0-1 1v4.615a1.431 1.431 0 0 0-.615-.829L7.21 5.23A1.439 1.439 0 0 0 5 6.445v9.11a1.44 1.44 0 0 0 2.21 1.215l7.175-4.555a1.436 1.436 0 0 0 .616-.828V16a1 1 0 0 0 2 0V6C17 5.448 16.552 5 16 5z');
+    svg.appendChild(path);
 
     const text = document.createElement('span');
     text.className = 'vjs-control-text';
     text.textContent = controlText;
 
-    btn.appendChild(icon);
+    btn.appendChild(svg);
     btn.appendChild(text);
     return btn;
   }
