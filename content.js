@@ -52,9 +52,60 @@
     return -1;
   }
 
-  // ---------- 点击某个 li ----------
-  function clickLesson(li) {
+  // ---------- 工具：判断目标 li 所在章节组是否已展开 ----------
+  function isCollapseExpanded(li) {
+    // 向上找最近的 div.collapse 父元素
+    const collapse = li?.closest('div.collapse');
+    if (!collapse) return true; // 找不到就当作已展开（不阻塞）
+    // daisyUI collapse 用 input[type=checkbox] 控制展开
+    const checkbox = collapse.querySelector('input[type="checkbox"]');
+    if (checkbox) return checkbox.checked;
+    // 兜底：检查 ul.collapse-content 是否有可见的 li
+    const ul = collapse.querySelector('ul.collapse-content');
+    if (!ul) return true;
+    return ul.children.length > 0 && ul.offsetHeight > 0;
+  }
+
+  // ---------- 工具：展开目标 li 所在的章节组 ----------
+  function expandCollapseOf(li) {
+    const collapse = li?.closest('div.collapse');
+    if (!collapse) return false;
+    // 如果已展开就直接返回
+    if (isCollapseExpanded(li)) return false;
+    // 点击 .collapse-title 触发展开
+    const title = collapse.querySelector('.collapse-title');
+    if (title) {
+      console.log('[ysjf-enhancer] 章节组折叠中，先展开:', title.querySelector('h3')?.textContent || '');
+      title.click();
+      return true;
+    }
+    return false;
+  }
+
+  // ---------- 工具：等待目标章节组展开（最多 timeout 毫秒） ----------
+  function waitForExpand(li, timeoutMs = 1000) {
+    return new Promise((resolve) => {
+      const start = Date.now();
+      const tick = setInterval(() => {
+        if (isCollapseExpanded(li)) {
+          clearInterval(tick);
+          resolve(true);
+        } else if (Date.now() - start > timeoutMs) {
+          clearInterval(tick);
+          resolve(false);
+        }
+      }, 50);
+    });
+  }
+
+  // ---------- 点击某个 li（点击前确保父章节组已展开）----------
+  async function clickLesson(li) {
     if (!li) return false;
+    // 如果父章节组未展开，先展开
+    if (!isCollapseExpanded(li)) {
+      expandCollapseOf(li);
+      await waitForExpand(li);
+    }
     const target = li.querySelector('div.cursor-pointer') || li;
     target.click();
     return true;
@@ -164,7 +215,7 @@
         switching = true;
         lockButtons();
         const targetIdx = idx - 1;
-        clickLesson(lessons[targetIdx]);
+        await clickLesson(lessons[targetIdx]);
         console.log('[ysjf-enhancer] 点击上一个 (idx=' + targetIdx + ')');
         await waitForSwitch(targetIdx);
         switching = false;
@@ -345,7 +396,7 @@
     switching = true;
     lockButtons();
     const targetIdx = idx + 1;
-    clickLesson(lessons[targetIdx]);
+    await clickLesson(lessons[targetIdx]);
     console.log('[ysjf-enhancer] 自动点击下一个 (idx=' + targetIdx + ')');
     await waitForSwitch(targetIdx);
     switching = false;
