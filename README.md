@@ -26,10 +26,10 @@
 
 ### 第一步：下载代码
 
-前往 [GitHub 仓库](https://github.com/itchaox/ysjf-player-enhancer) 下载 ZIP 并解压，或用 git 克隆：
+前往 [GitHub 仓库](https://github.com/itchaox/ysjf-player-helper) 下载 ZIP 并解压，或用 git 克隆：
 
 ```bash
-git clone git@github.com:itchaox/ysjf-player-enhancer.git
+git clone git@github.com:itchaox/ysjf-player-helper.git
 ```
 
 ### 第二步：加载扩展
@@ -79,7 +79,7 @@ git clone git@github.com:itchaox/ysjf-player-enhancer.git
 
 ### 普通用户怎么调试？
 
-不用调试，遇到问题去 [GitHub Issues](https://github.com/itchaox/ysjf-player-enhancer/issues) 反馈。
+不用调试，遇到问题去 [GitHub Issues](https://github.com/itchaox/ysjf-player-helper/issues) 反馈。
 
 ---
 

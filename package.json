@@ -1,5 +1,5 @@
 {
-  "name": "ysjf-player-enhancer",
+  "name": "ysjf-player-helper",
   "version": "1.0.0",
   "private": true,
   "description": "Chrome extension dev tools: file watcher that auto-reloads the extension via Chrome DevTools Protocol",
