@@ -68,17 +68,26 @@
     input:checked + .slider:before {
       transform: translateX(20px);
     }
+    /* 关注引导文案 */
+    .follow-hint {
+      margin: 18px 0 8px;
+      padding: 0 4px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #888;
+      text-align: center;
+    }
     /* 关注作者按钮：B站品牌色 */
     .follow-btn {
       display: block;
-      margin: 16px auto 0;
+      margin: 0 auto;
       padding: 10px 20px;
       background: #fb7299; /* B 站粉色 */
       color: #fff;
       text-align: center;
       text-decoration: none;
       border-radius: 6px;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 500;
       box-shadow: 0 2px 6px rgba(251, 114, 153, 0.3);
       transition: background 0.15s, transform 0.1s;
@@ -88,6 +97,12 @@
     }
     .follow-btn:active {
       transform: scale(0.97);
+    }
+    /* 放大按钮左侧的手指 emoji */
+    .follow-emoji {
+      font-size: 20px;
+      margin-right: 6px;
+      vertical-align: -2px;
     }
   </style>
 </head>
@@ -110,8 +125,12 @@
     </label>
   </div>
 
+  <p class="follow-hint">
+    插件对你有帮助的话，可以关注一下作者 B 站，支持开发者持续更新 💖
+  </p>
+
   <a href="https://space.bilibili.com/521041866" target="_blank" rel="noopener noreferrer" class="follow-btn">
-    👉 关注作者（B站）
+    <span class="follow-emoji">👉</span>关注作者（B站）
   </a>
 
   <script src="popup.js"></script>
