@@ -4,36 +4,165 @@
     <meta charset="UTF-8" />
     <title>飓风课堂播放器助手</title>
     <style>
+      :root {
+        --brand-blue: #1e88e5;
+        --brand-blue-dark: #1565c0;
+        --brand-pink: #fb7299;
+        --brand-pink-soft: #fff0f5;
+        --bg-soft: #f8f9fb;
+        --border: #e8eaed;
+        --text-1: #1a1a1a;
+        --text-2: #555;
+        --text-3: #888;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
-        width: 240px;
-        padding: 20px;
+        width: 300px;
         margin: 0;
-        font-family: Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-        background-color: #ffffff;
+        font-family: 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+        background: #fff;
+        color: var(--text-1);
       }
-      .test-text {
-        font-size: 24px;
-        font-weight: bold;
-        color: #333;
+
+      /* ────── 顶部品牌头部 ────── */
+      .header {
+        background: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-blue-dark) 100%);
+        color: #fff;
+        padding: 16px 20px 18px;
         text-align: center;
-        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(30, 136, 229, 0.15);
       }
+      .header-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        margin-bottom: 8px;
+      }
+      .header-icon svg {
+        width: 22px;
+        height: 22px;
+        fill: #fff;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+      .header p {
+        margin: 4px 0 0;
+        font-size: 11px;
+        opacity: 0.85;
+        font-weight: 400;
+      }
+
+      /* ────── 主体内容区 ────── */
+      .main {
+        padding: 16px 20px;
+      }
+
+      /* 跳转按钮 */
+      .goto-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px 14px;
+        margin-bottom: 14px;
+        background: var(--brand-blue);
+        color: #fff;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 2px 6px rgba(30, 136, 229, 0.25);
+        transition: all 0.15s ease;
+      }
+      .goto-btn:hover {
+        background: var(--brand-blue-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(30, 136, 229, 0.3);
+      }
+      .goto-btn:active {
+        transform: translateY(0);
+      }
+      .goto-btn svg {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+      }
+
+      /* 功能设置区 */
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 0 0 10px;
+      }
+      .section-title::before,
+      .section-title::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* 开关卡片容器 */
+      .settings-card {
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
       .switch-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 8px 0;
+        padding: 12px 14px;
+        transition: background 0.15s;
+      }
+      .switch-row + .switch-row {
+        border-top: 1px solid var(--border);
+      }
+      .switch-row:hover {
+        background: rgba(30, 136, 229, 0.04);
+      }
+      .switch-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
       }
       .switch-label {
-        font-size: 16px;
-        color: #333;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-1);
       }
+      .switch-desc {
+        font-size: 11px;
+        color: var(--text-3);
+      }
+
       /* Switch 样式 */
       .switch {
         position: relative;
         display: inline-block;
-        width: 44px;
-        height: 24px;
+        width: 40px;
+        height: 22px;
+        flex-shrink: 0;
       }
       .switch input {
         opacity: 0;
@@ -47,132 +176,143 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background-color: #ccc;
-        transition: 0.3s;
-        border-radius: 24px;
+        background: #cfd4dc;
+        transition: 0.25s;
+        border-radius: 22px;
       }
-      .slider:before {
+      .slider::before {
         position: absolute;
         content: '';
-        height: 18px;
-        width: 18px;
+        height: 16px;
+        width: 16px;
         left: 3px;
         bottom: 3px;
-        background-color: white;
-        transition: 0.3s;
+        background: #fff;
+        transition: 0.25s;
         border-radius: 50%;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
       }
       input:checked + .slider {
-        background-color: #4caf50;
+        background: var(--brand-blue);
       }
-      input:checked + .slider:before {
-        transform: translateX(20px);
+      input:checked + .slider::before {
+        transform: translateX(18px);
       }
-      /* 关注引导文案 */
-      .follow-hint {
-        margin: 18px 0 8px;
-        padding: 0 4px;
+
+      /* ────── 底部引流区 ────── */
+      .footer {
+        padding: 14px 20px 16px;
+        background: var(--brand-pink-soft);
+        border-top: 1px solid var(--border);
+      }
+      .footer-hint {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        margin: 0 0 10px;
         font-size: 12px;
-        line-height: 1.5;
-        color: #888;
+        color: var(--text-2);
         text-align: center;
       }
-      /* 关注作者按钮：B站品牌色 */
+      .footer-hint .heart {
+        color: var(--brand-pink);
+        font-size: 14px;
+      }
+
       .follow-btn {
-        display: block;
-        margin: 0 auto;
-        padding: 10px 20px;
-        background: #fb7299; /* B 站粉色 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px 16px;
+        background: var(--brand-pink);
         color: #fff;
-        text-align: center;
         text-decoration: none;
-        border-radius: 6px;
-        font-size: 15px;
+        border-radius: 8px;
+        font-size: 14px;
         font-weight: 500;
         box-shadow: 0 2px 6px rgba(251, 114, 153, 0.3);
-        transition:
-          background 0.15s,
-          transform 0.1s;
+        transition: all 0.15s ease;
       }
       .follow-btn:hover {
         background: #fc8caf;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(251, 114, 153, 0.4);
       }
       .follow-btn:active {
-        transform: scale(0.97);
+        transform: translateY(0);
       }
-      /* 放大按钮左侧的手指 emoji */
       .follow-emoji {
-        font-size: 20px;
-        margin-right: 6px;
-        vertical-align: -2px;
-      }
-      /* 跳转飓风课堂的文字按钮 */
-      .goto-btn {
-        display: block;
-        margin: 8px 0 16px;
-        padding: 8px 12px;
-        color: #1e88e5;
-        text-align: center;
-        text-decoration: none;
-        border-radius: 6px;
-        font-size: 13px;
-        background: #f0f7ff;
-        transition: background 0.15s;
-      }
-      .goto-btn:hover {
-        background: #e3f0ff;
-      }
-      .goto-emoji {
-        font-size: 16px;
-        margin-right: 4px;
-        vertical-align: -2px;
+        font-size: 18px;
+        line-height: 1;
       }
     </style>
   </head>
   <body>
-    <div class="test-text">飓风课堂播放器助手</div>
-
-    <a
-      href="https://course.ysjf.com/"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="goto-btn"
-    >
-      <span class="goto-emoji">🎬</span>现在去飓风课堂学习~
-    </a>
-
-    <div class="switch-row">
-      <span class="switch-label">上下切换按钮</span>
-      <label class="switch">
-        <input
-          type="checkbox"
-          id="enhancerSwitch"
-        />
-        <span class="slider"></span>
-      </label>
+    <!-- 顶部品牌头部 -->
+    <div class="header">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+      <h1>飓风课堂播放器助手</h1>
+      <p>学习更顺手 · 视频不间断</p>
     </div>
 
-    <div class="switch-row">
-      <span class="switch-label">自动连播</span>
-      <label class="switch">
-        <input
-          type="checkbox"
-          id="autoplaySwitch"
-        />
-        <span class="slider"></span>
-      </label>
+    <!-- 主体内容 -->
+    <div class="main">
+      <!-- 跳转按钮 -->
+      <a
+        href="https://course.ysjf.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="goto-btn"
+      >
+        <svg viewBox="0 0 24 24"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7zM19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7z"/></svg>
+        现在去飓风课堂学习
+      </a>
+
+      <!-- 功能设置 -->
+      <div class="section-title">功能设置</div>
+      <div class="settings-card">
+        <div class="switch-row">
+          <div class="switch-info">
+            <span class="switch-label">上下切换按钮</span>
+            <span class="switch-desc">播放器里快速切章节</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="enhancerSwitch" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="switch-row">
+          <div class="switch-info">
+            <span class="switch-label">自动连播</span>
+            <span class="switch-desc">视频结束自动下一节</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="autoplaySwitch" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
     </div>
 
-    <p class="follow-hint">插件对你有帮助的话，可以关注一下作者 B 站，支持开发者持续更新 💖</p>
-
-    <a
-      href="https://space.bilibili.com/521041866"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="follow-btn"
-    >
-      <span class="follow-emoji">👉</span>关注作者（B站）
-    </a>
+    <!-- 底部引流 -->
+    <div class="footer">
+      <p class="footer-hint">
+        <span class="heart">💖</span>
+        插件对你有帮助？支持一下作者
+      </p>
+      <a
+        href="https://space.bilibili.com/521041866"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="follow-btn"
+      >
+        <span class="follow-emoji">👉</span>关注作者 B 站
+      </a>
+    </div>
 
     <script src="popup.js"></script>
   </body>
