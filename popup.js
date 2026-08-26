@@ -2,11 +2,11 @@
 //
 // 开关：
 //   - enhancerSwitch  → enhancerEnabled  (上下切换按钮)
-//   - autoplaySwitch  → autoplayEnabled  (自动播放：视频结束后自动下一节)
+//   - autoplaySwitch  → autoplayEnabled  (自动连播：视频结束后自动下一节)
 
 const SWITCHES = [
   { id: 'enhancerSwitch', key: 'enhancerEnabled', label: '上下切换按钮' },
-  { id: 'autoplaySwitch', key: 'autoplayEnabled', label: '自动播放' },
+  { id: 'autoplaySwitch', key: 'autoplayEnabled', label: '自动连播' },
 ];
 
 function init() {

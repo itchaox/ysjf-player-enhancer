@@ -28,7 +28,7 @@
   let switching = false;
   let controlBarObserver = null; // 监听 .vjs-control-bar 是否出现
   let refreshTimer = null;
-  let autoplayEnabled = false; // 是否启用自动播放
+  let autoplayEnabled = false; // 是否启用自动连播
   let autoplayObserver = null; // 监听 <video> 标签出现
   let videoEndedHandler = null; // video ended 事件处理函数
   let currentVideo = null; // 当前监听的 video 元素
@@ -305,7 +305,7 @@
       clearInterval(refreshTimer);
       refreshTimer = null;
     }
-    // 同时清理自动播放的资源
+    // 同时清理自动连播的资源
     detachVideoListener();
     if (prevBtn) prevBtn.remove();
     if (nextBtn) nextBtn.remove();
@@ -329,10 +329,10 @@
     return false;
   });
 
-  // ---------- 自动播放：监听 <video> 的 ended 事件 ----------
+  // ---------- 自动连播：监听 <video> 的 ended 事件 ----------
   function setAutoplay(enabled) {
     autoplayEnabled = Boolean(enabled);
-    console.log('[ysjf-enhancer] 自动播放:', autoplayEnabled ? '开启' : '关闭');
+    console.log('[ysjf-enhancer] 自动连播:', autoplayEnabled ? '开启' : '关闭');
     if (autoplayEnabled) {
       attachVideoListener();
     } else {
@@ -386,7 +386,7 @@
     console.log('[ysjf-enhancer] 已绑定 video ended 监听');
   }
 
-  // "下一个"逻辑：从按钮处理中抽出来，自动播放复用
+  // "下一个"逻辑：从按钮处理中抽出来，自动连播复用
   async function handleNext() {
     if (switching) return;
     const lessons = collectLessons();
@@ -420,7 +420,7 @@
             mount();
           }
           if (resp.autoplayEnabled) {
-            console.log('[ysjf-enhancer] 主动查询到 autoplayEnabled=true，启用自动播放');
+            console.log('[ysjf-enhancer] 主动查询到 autoplayEnabled=true，启用自动连播');
             setAutoplay(true);
           }
         }
