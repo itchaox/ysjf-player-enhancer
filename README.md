@@ -2,6 +2,14 @@
 
 一个 Chrome 浏览器扩展（Manifest V3），专门为 [飓风课堂](https://course.ysjf.com/) 打造，让视频学习更顺手。
 
+## 作者
+
+🎬 **[爱听书的程序员阿超](https://space.bilibili.com/521041866)** —— B站 AI 自媒体，分享 AI 编程实战。
+
+如果这个项目对你有帮助，欢迎来 B站 **点个关注** 👆，你的支持是我持续分享的动力！
+
+---
+
 ## 它能做什么
 
 - 🎬 **播放器里直接切换章节**：在视频控制栏里出现 ⏮ "上一个" / ⏭ "下一个" 两个按钮，点一下就切到对应章节，不用回到右边目录去找
@@ -70,12 +78,6 @@ git clone git@github.com:itchaox/ysjf-player-enhancer.git
 不用调试，遇到问题去 [GitHub Issues](https://github.com/itchaox/ysjf-player-enhancer/issues) 反馈。
 
 ---
-
-## 作者
-
-🎬 **[爱听书的程序员阿超](https://space.bilibili.com/521041866)** —— B站 AI 自媒体，分享 AI 编程实战。
-
-如果这个项目对你有帮助，欢迎来 B站 **点个关注** 👆，你的支持是我持续分享的动力！
 
 ## 开发者指南
 
