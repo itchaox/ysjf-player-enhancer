@@ -1,163 +1,179 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <title>ysjf-player-enhancer</title>
-  <style>
-    body {
-      width: 240px;
-      padding: 20px;
-      margin: 0;
-      font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
-      background-color: #ffffff;
-    }
-    .test-text {
-      font-size: 24px;
-      font-weight: bold;
-      color: #333;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .switch-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 0;
-    }
-    .switch-label {
-      font-size: 14px;
-      color: #333;
-    }
-    /* Switch 样式 */
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 44px;
-      height: 24px;
-    }
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: 0.3s;
-      border-radius: 24px;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: 0.3s;
-      border-radius: 50%;
-    }
-    input:checked + .slider {
-      background-color: #4CAF50;
-    }
-    input:checked + .slider:before {
-      transform: translateX(20px);
-    }
-    /* 关注引导文案 */
-    .follow-hint {
-      margin: 18px 0 8px;
-      padding: 0 4px;
-      font-size: 12px;
-      line-height: 1.5;
-      color: #888;
-      text-align: center;
-    }
-    /* 关注作者按钮：B站品牌色 */
-    .follow-btn {
-      display: block;
-      margin: 0 auto;
-      padding: 10px 20px;
-      background: #fb7299; /* B 站粉色 */
-      color: #fff;
-      text-align: center;
-      text-decoration: none;
-      border-radius: 6px;
-      font-size: 15px;
-      font-weight: 500;
-      box-shadow: 0 2px 6px rgba(251, 114, 153, 0.3);
-      transition: background 0.15s, transform 0.1s;
-    }
-    .follow-btn:hover {
-      background: #fc8caf;
-    }
-    .follow-btn:active {
-      transform: scale(0.97);
-    }
-    /* 放大按钮左侧的手指 emoji */
-    .follow-emoji {
-      font-size: 20px;
-      margin-right: 6px;
-      vertical-align: -2px;
-    }
-    /* 跳转飓风课堂的文字按钮 */
-    .goto-btn {
-      display: block;
-      margin: 8px 0 16px;
-      padding: 8px 12px;
-      color: #1e88e5;
-      text-align: center;
-      text-decoration: none;
-      border-radius: 6px;
-      font-size: 13px;
-      background: #f0f7ff;
-      transition: background 0.15s;
-    }
-    .goto-btn:hover {
-      background: #e3f0ff;
-    }
-    .goto-emoji {
-      font-size: 16px;
-      margin-right: 4px;
-      vertical-align: -2px;
-    }
-  </style>
-</head>
-<body>
-  <div class="test-text">ysjf-player-enhancer</div>
+  <head>
+    <meta charset="UTF-8" />
+    <title>飓风课堂播放器助手</title>
+    <style>
+      body {
+        width: 240px;
+        padding: 20px;
+        margin: 0;
+        font-family: Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        background-color: #ffffff;
+      }
+      .test-text {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .switch-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 0;
+      }
+      .switch-label {
+        font-size: 14px;
+        color: #333;
+      }
+      /* Switch 样式 */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.3s;
+        border-radius: 24px;
+      }
+      .slider:before {
+        position: absolute;
+        content: '';
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+      }
+      input:checked + .slider {
+        background-color: #4caf50;
+      }
+      input:checked + .slider:before {
+        transform: translateX(20px);
+      }
+      /* 关注引导文案 */
+      .follow-hint {
+        margin: 18px 0 8px;
+        padding: 0 4px;
+        font-size: 12px;
+        line-height: 1.5;
+        color: #888;
+        text-align: center;
+      }
+      /* 关注作者按钮：B站品牌色 */
+      .follow-btn {
+        display: block;
+        margin: 0 auto;
+        padding: 10px 20px;
+        background: #fb7299; /* B 站粉色 */
+        color: #fff;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 500;
+        box-shadow: 0 2px 6px rgba(251, 114, 153, 0.3);
+        transition:
+          background 0.15s,
+          transform 0.1s;
+      }
+      .follow-btn:hover {
+        background: #fc8caf;
+      }
+      .follow-btn:active {
+        transform: scale(0.97);
+      }
+      /* 放大按钮左侧的手指 emoji */
+      .follow-emoji {
+        font-size: 20px;
+        margin-right: 6px;
+        vertical-align: -2px;
+      }
+      /* 跳转飓风课堂的文字按钮 */
+      .goto-btn {
+        display: block;
+        margin: 8px 0 16px;
+        padding: 8px 12px;
+        color: #1e88e5;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 13px;
+        background: #f0f7ff;
+        transition: background 0.15s;
+      }
+      .goto-btn:hover {
+        background: #e3f0ff;
+      }
+      .goto-emoji {
+        font-size: 16px;
+        margin-right: 4px;
+        vertical-align: -2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-text">飓风课堂播放器助手</div>
 
-  <a href="https://course.ysjf.com/" target="_blank" rel="noopener noreferrer" class="goto-btn">
-    <span class="goto-emoji">🎬</span>现在去飓风课堂学习~
-  </a>
+    <a
+      href="https://course.ysjf.com/"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="goto-btn"
+    >
+      <span class="goto-emoji">🎬</span>现在去飓风课堂学习~
+    </a>
 
-  <div class="switch-row">
-    <span class="switch-label">上下切换按钮</span>
-    <label class="switch">
-      <input type="checkbox" id="enhancerSwitch">
-      <span class="slider"></span>
-    </label>
-  </div>
+    <div class="switch-row">
+      <span class="switch-label">上下切换按钮</span>
+      <label class="switch">
+        <input
+          type="checkbox"
+          id="enhancerSwitch"
+        />
+        <span class="slider"></span>
+      </label>
+    </div>
 
-  <div class="switch-row">
-    <span class="switch-label">自动连播</span>
-    <label class="switch">
-      <input type="checkbox" id="autoplaySwitch">
-      <span class="slider"></span>
-    </label>
-  </div>
+    <div class="switch-row">
+      <span class="switch-label">自动连播</span>
+      <label class="switch">
+        <input
+          type="checkbox"
+          id="autoplaySwitch"
+        />
+        <span class="slider"></span>
+      </label>
+    </div>
 
-  <p class="follow-hint">
-    插件对你有帮助的话，可以关注一下作者 B 站，支持开发者持续更新 💖
-  </p>
+    <p class="follow-hint">插件对你有帮助的话，可以关注一下作者 B 站，支持开发者持续更新 💖</p>
 
-  <a href="https://space.bilibili.com/521041866" target="_blank" rel="noopener noreferrer" class="follow-btn">
-    <span class="follow-emoji">👉</span>关注作者（B站）
-  </a>
+    <a
+      href="https://space.bilibili.com/521041866"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="follow-btn"
+    >
+      <span class="follow-emoji">👉</span>关注作者（B站）
+    </a>
 
-  <script src="popup.js"></script>
-</body>
+    <script src="popup.js"></script>
+  </body>
 </html>
