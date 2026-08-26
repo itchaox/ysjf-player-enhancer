@@ -28,6 +28,10 @@
   let switching = false;
   let controlBarObserver = null; // 监听 .vjs-control-bar 是否出现
   let refreshTimer = null;
+  let autoplayEnabled = false; // 是否启用自动播放
+  let autoplayObserver = null; // 监听 <video> 标签出现
+  let videoEndedHandler = null; // video ended 事件处理函数
+  let currentVideo = null; // 当前监听的 video 元素
 
   // ---------- 工具：收集所有 li ----------
   function collectLessons() {
@@ -170,20 +174,8 @@
 
     if (!nextBtn) {
       nextBtn = createEnhancerButton(NEXT_BTN_ID, '下一个', '下一个');
-      nextBtn.addEventListener('click', async () => {
-        if (switching) return;
-        const lessons = collectLessons();
-        const idx = findCurrentLessonIndex(lessons);
-        if (idx < 0 || idx >= lessons.length - 1) return;
-
-        switching = true;
-        lockButtons();
-        const targetIdx = idx + 1;
-        clickLesson(lessons[targetIdx]);
-        console.log('[ysjf-enhancer] 点击下一个 (idx=' + targetIdx + ')');
-        await waitForSwitch(targetIdx);
-        switching = false;
-        refreshButtonState();
+      nextBtn.addEventListener('click', () => {
+        handleNext();
       });
     }
 
@@ -260,6 +252,8 @@
       clearInterval(refreshTimer);
       refreshTimer = null;
     }
+    // 同时清理自动播放的资源
+    detachVideoListener();
     if (prevBtn) prevBtn.remove();
     if (nextBtn) nextBtn.remove();
     prevBtn = null;
@@ -270,14 +264,95 @@
 
   // ---------- 接收 background 消息 ----------
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-    if (!msg || msg.type !== 'ysjf-toggle') return;
-    if (msg.enabled) mount(); else unmount();
-    sendResponse({ ok: true, mounted: msg.enabled });
+    if (!msg || msg.type !== 'ysjf-state') return;
+    // 同步两个开关的状态
+    if (typeof msg.enhancerEnabled === 'boolean') {
+      if (msg.enhancerEnabled) mount(); else unmount();
+    }
+    if (typeof msg.autoplayEnabled === 'boolean') {
+      setAutoplay(msg.autoplayEnabled);
+    }
+    sendResponse({ ok: true });
     return false;
   });
 
+  // ---------- 自动播放：监听 <video> 的 ended 事件 ----------
+  function setAutoplay(enabled) {
+    autoplayEnabled = Boolean(enabled);
+    console.log('[ysjf-enhancer] 自动播放:', autoplayEnabled ? '开启' : '关闭');
+    if (autoplayEnabled) {
+      attachVideoListener();
+    } else {
+      detachVideoListener();
+    }
+  }
+
+  function detachVideoListener() {
+    if (currentVideo && videoEndedHandler) {
+      currentVideo.removeEventListener('ended', videoEndedHandler);
+    }
+    currentVideo = null;
+    videoEndedHandler = null;
+    if (autoplayObserver) {
+      autoplayObserver.disconnect();
+      autoplayObserver = null;
+    }
+  }
+
+  function attachVideoListener() {
+    // 立即尝试一次
+    tryAttachToVideo();
+
+    // 用 MutationObserver 监听 <video> 标签出现（视频可能异步加载）
+    if (!autoplayObserver) {
+      autoplayObserver = new MutationObserver(() => {
+        tryAttachToVideo();
+      });
+      autoplayObserver.observe(document.body, { childList: true, subtree: true });
+    }
+  }
+
+  function tryAttachToVideo() {
+    // video.js 把 <video> 放在 .vjs-tech 类下，也兼容直接的 <video>
+    const video = document.querySelector('video.vjs-tech') || document.querySelector('video');
+    if (!video) return;
+    if (video === currentVideo) return; // 已经绑定过了
+
+    // 解绑旧的
+    if (currentVideo && videoEndedHandler) {
+      currentVideo.removeEventListener('ended', videoEndedHandler);
+    }
+
+    videoEndedHandler = () => {
+      console.log('[ysjf-enhancer] 视频播放结束，触发自动下一节');
+      // 模拟点击"下一个"按钮的逻辑
+      handleNext();
+    };
+    video.addEventListener('ended', videoEndedHandler);
+    currentVideo = video;
+    console.log('[ysjf-enhancer] 已绑定 video ended 监听');
+  }
+
+  // "下一个"逻辑：从按钮处理中抽出来，自动播放复用
+  async function handleNext() {
+    if (switching) return;
+    const lessons = collectLessons();
+    const idx = findCurrentLessonIndex(lessons);
+    if (idx < 0 || idx >= lessons.length - 1) {
+      console.log('[ysjf-enhancer] 已经是最后一节，不再自动切换');
+      return;
+    }
+    switching = true;
+    lockButtons();
+    const targetIdx = idx + 1;
+    clickLesson(lessons[targetIdx]);
+    console.log('[ysjf-enhancer] 自动点击下一个 (idx=' + targetIdx + ')');
+    await waitForSwitch(targetIdx);
+    switching = false;
+    refreshButtonState();
+  }
+
   // ---------- 主动查询 background 当前状态 ----------
-  // 解决：storage.enabled=true 但页面刚打开时按钮不显示的问题
   // content script 注入后立即问 background，background 回当前状态
   function queryStateAndMount() {
     try {
@@ -286,11 +361,15 @@
           console.warn('[ysjf-enhancer] 查询 background 状态失败:', chrome.runtime.lastError.message);
           return;
         }
-        if (resp && resp.enabled) {
-          console.log('[ysjf-enhancer] 主动查询到 enabled=true，挂载按钮');
-          mount();
-        } else {
-          console.log('[ysjf-enhancer] 主动查询 enabled=false，不挂载');
+        if (resp) {
+          if (resp.enhancerEnabled) {
+            console.log('[ysjf-enhancer] 主动查询到 enhancerEnabled=true，挂载按钮');
+            mount();
+          }
+          if (resp.autoplayEnabled) {
+            console.log('[ysjf-enhancer] 主动查询到 autoplayEnabled=true，启用自动播放');
+            setAutoplay(true);
+          }
         }
       });
     } catch (e) {
