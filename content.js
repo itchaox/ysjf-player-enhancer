@@ -95,7 +95,7 @@
       }
       /* 缩小按钮与播放按钮的间距 */
       .vjs-button.ysjf-enhancer-btn {
-        margin: 0 1px !important;
+        margin: 0 !important;
       }
     `;
     const style = document.createElement('style');
