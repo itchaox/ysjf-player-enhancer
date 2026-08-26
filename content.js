@@ -146,7 +146,7 @@
     }
 
     if (!prevBtn) {
-      prevBtn = createEnhancerButton(PREV_BTN_ID, '上一节', '上一节');
+      prevBtn = createEnhancerButton(PREV_BTN_ID, '上一个', '上一个');
       prevBtn.addEventListener('click', async () => {
         if (switching) return;
         const lessons = collectLessons();
@@ -157,7 +157,7 @@
         lockButtons();
         const targetIdx = idx - 1;
         clickLesson(lessons[targetIdx]);
-        console.log('[ysjf-enhancer] 点击上一节 (idx=' + targetIdx + ')');
+        console.log('[ysjf-enhancer] 点击上一个 (idx=' + targetIdx + ')');
         await waitForSwitch(targetIdx);
         switching = false;
         refreshButtonState();
@@ -165,7 +165,7 @@
     }
 
     if (!nextBtn) {
-      nextBtn = createEnhancerButton(NEXT_BTN_ID, '下一节', '下一节');
+      nextBtn = createEnhancerButton(NEXT_BTN_ID, '下一个', '下一个');
       nextBtn.addEventListener('click', async () => {
         if (switching) return;
         const lessons = collectLessons();
@@ -176,7 +176,7 @@
         lockButtons();
         const targetIdx = idx + 1;
         clickLesson(lessons[targetIdx]);
-        console.log('[ysjf-enhancer] 点击下一节 (idx=' + targetIdx + ')');
+        console.log('[ysjf-enhancer] 点击下一个 (idx=' + targetIdx + ')');
         await waitForSwitch(targetIdx);
         switching = false;
         refreshButtonState();
