@@ -101,7 +101,7 @@ git clone git@github.com:itchaox/ysjf-player-helper.git
 ### 2. 启动文件监听（热加载）
 
 ```bash
-cd ysjf-player-enhancer
+cd ysjf-player-helper
 npm install
 npm run watch
 ```
