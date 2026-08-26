@@ -154,6 +154,58 @@
       .vjs-button.ysjf-enhancer-btn {
         margin: 0 !important;
       }
+      /* 修复控制栏被撑大后画质按钮位置异常 */
+      .vjs-progress-control {
+        flex: 1 1 auto !important;
+        min-width: 80px;
+      }
+      .vjs-menu-button.tcp-video-quality-switcher,
+      .vjs-playback-rate,
+      .vjs-picture-in-picture-control,
+      .vjs-fullscreen-control {
+        flex-shrink: 0 !important;
+      }
+      /* 强制 spacer 留在 progress-control 和画质之间，不要跑到画质右侧 */
+      .vjs-custom-control-spacer {
+        order: 5 !important;
+      }
+      .vjs-progress-control {
+        order: 4 !important;
+      }
+      .vjs-menu-button.tcp-video-quality-switcher {
+        order: 6 !important;
+      }
+      .vjs-playback-rate {
+        order: 7 !important;
+      }
+      .vjs-picture-in-picture-control {
+        order: 8 !important;
+      }
+      .vjs-fullscreen-control {
+        order: 9 !important;
+      }
+      /* 我们加的按钮保持最左侧 */
+      #${PREV_BTN_ID} {
+        order: 1 !important;
+      }
+      .vjs-play-control {
+        order: 2 !important;
+      }
+      #${NEXT_BTN_ID} {
+        order: 3 !important;
+      }
+      /* 音量面板保持在播放按钮之后 */
+      .vjs-volume-panel {
+        order: 4 !important;
+      }
+      /* 时间显示在音量之后 */
+      .vjs-current-time,
+      .vjs-time-divider,
+      .vjs-duration,
+      .vjs-pdt-time,
+      .vjs-remaining-time {
+        order: 5 !important;
+      }
     `;
     const style = document.createElement('style');
     style.id = STYLE_ID;
