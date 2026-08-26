@@ -2,6 +2,12 @@
 
 一个面向 [course.ysjf.com](https://course.ysjf.com/) 的 Chrome 浏览器扩展（Manifest V3），在 video.js 播放器的原生控制栏里嵌入"上一个 / 下一个"两个按钮，并支持视频结束后自动切到下一节。
 
+## 作者
+
+🎬 **[爱听书的程序员阿超](https://space.bilibili.com/521041866)** —— B站 AI 自媒体，分享 AI 编程实战。
+
+如果这个项目对你有帮助，欢迎来 B站 **点个关注** 👆，你的支持是我持续分享的动力！
+
 ## 功能
 
 - 🎬 **嵌入播放器控制栏**：按钮插入到 `.vjs-control-bar` 内 `.vjs-play-control` 按钮的左右两侧，外观与原生控件一致
