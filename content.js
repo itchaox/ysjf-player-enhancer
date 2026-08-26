@@ -93,6 +93,10 @@
         transform: rotate(180deg);
         transform-origin: center center;
       }
+      /* 缩小按钮与播放按钮的间距 */
+      .vjs-button.ysjf-enhancer-btn {
+        margin: 0 1px !important;
+      }
     `;
     const style = document.createElement('style');
     style.id = STYLE_ID;
