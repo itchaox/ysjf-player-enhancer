@@ -111,7 +111,7 @@ npm run watch
 ### 项目结构
 
 ```
-ysjf-player-enhancer/
+ysjf-player-helper/
 ├── manifest.json          # 扩展配置
 ├── popup.html             # 弹窗 UI
 ├── popup.js               # 弹窗逻辑

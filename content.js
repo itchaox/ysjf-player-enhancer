@@ -8,7 +8,7 @@
   'use strict';
 
   const TARGET_HOST = 'course.ysjf.com';
-  const STYLE_ID = 'ysjf-player-enhancer-style';
+  const STYLE_ID = 'ysjf-player-helper-style';
   const PREV_BTN_ID = 'ysjf-enhancer-prev';
   const NEXT_BTN_ID = 'ysjf-enhancer-next';
 
