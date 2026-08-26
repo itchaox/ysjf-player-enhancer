@@ -4,7 +4,8 @@
   "private": true,
   "description": "Chrome extension dev tools: file watcher that auto-reloads the extension via Chrome DevTools Protocol",
   "scripts": {
-    "watch": "node scripts/watch.js"
+    "watch": "node scripts/watch.js",
+    "build": "node scripts/build.js"
   },
   "devDependencies": {
     "chokidar": "^3.6.0",
