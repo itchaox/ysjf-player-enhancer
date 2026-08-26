@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "ysjf-player-enhancer",
+  "name": "飓风课堂播放器增强器",
   "version": "1.0.0",
   "description": "在飓风课堂的播放器原生控制栏嵌入「上一个 / 下一个」按钮，支持视频结束自动连播，专为飓风课堂设计。",
   "permissions": ["storage", "tabs"],
@@ -17,7 +17,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "ysjf-player-enhancer"
+    "default_title": "飓风课堂播放器增强器"
   },
   "icons": {
     "16": "icons/icon16.png",
