@@ -1,6 +1,6 @@
 # ysjf-player-enhancer
 
-一个面向 [course.ysjf.com](https://course.ysjf.com/) 的 Chrome 浏览器扩展（Manifest V3），在 video.js 播放器的原生控制栏里嵌入"上一个 / 下一个"两个按钮，并支持视频结束后自动切到下一节。
+一个面向 [course.ysjf.com](https://course.ysjf.com/) 的 Chrome 浏览器扩展（Manifest V3），在播放器的原生控制栏里嵌入"上一个 / 下一个"两个按钮，并支持视频结束后自动切到下一节。
 
 ## 作者
 
