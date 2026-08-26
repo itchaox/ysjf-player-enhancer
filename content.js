@@ -57,8 +57,9 @@
     // 向上找最近的 div.collapse 父元素
     const collapse = li?.closest('div.collapse');
     if (!collapse) return true; // 找不到就当作已展开（不阻塞）
-    // daisyUI collapse 用 input[type=checkbox] 控制展开
-    const checkbox = collapse.querySelector('input[type="checkbox"]');
+    // daisyUI collapse 用 input[type=checkbox][name=unit] 控制展开
+    // 限定 name='unit' 防止误中其他 checkbox
+    const checkbox = collapse.querySelector('input[type="checkbox"][name="unit"]');
     if (checkbox) return checkbox.checked;
     // 兜底：检查 ul.collapse-content 是否有可见的 li
     const ul = collapse.querySelector('ul.collapse-content');
@@ -79,6 +80,7 @@
       title.click();
       return true;
     }
+    console.warn('[ysjf-enhancer] 找不到 .collapse-title，章节组可能结构变了');
     return false;
   }
 
