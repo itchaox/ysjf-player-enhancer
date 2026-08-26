@@ -2,12 +2,9 @@
   "manifest_version": 3,
   "name": "ysjf-player-enhancer",
   "version": "1.0.0",
-  "description": "在播放器原生控制栏嵌入「上一个 / 下一个」按钮，支持视频结束自动连播，专为 course.ysjf.com 设计。",
+  "description": "在飓风课堂的播放器原生控制栏嵌入「上一个 / 下一个」按钮，支持视频结束自动连播，专为飓风课堂设计。",
   "permissions": ["storage", "tabs"],
-  "host_permissions": [
-    "http://127.0.0.1:*/*",
-    "https://course.ysjf.com/*"
-  ],
+  "host_permissions": ["http://127.0.0.1:*/*", "https://course.ysjf.com/*"],
   "background": {
     "service_worker": "background.js"
   },
